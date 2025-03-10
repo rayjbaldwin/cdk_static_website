@@ -79,5 +79,3 @@ class ServerStack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
             allocated_storage=20
         )
-        
-# commenting to fix error with github commits
