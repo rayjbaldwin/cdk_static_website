@@ -10,4 +10,3 @@ network_stack = NetworkStack(app, "NetworkStack")
 server_stack = ServerStack(app, "ServerStack", vpc=network_stack.vpc)
 app.synth()
 
-# commenting to fix error with github commits

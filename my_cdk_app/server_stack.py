@@ -33,23 +33,32 @@ class ServerStack(Stack):
         
 # Launch one web server in each public subnets
 
+        public_subnets = vpc.select_subnets(subnet_type=ec2.SubnetType.PUBLIC)
+
+        key_pair = ec2.KeyPair.from_key_pair_name(self, "KeyPair", "baldwinr-ec2-seis615")
+
         ec2.Instance(self, "Web Server 1",
             vpc=vpc,
             instance_type=InstanceType("t2.micro"),
-            machine_image=ec2.MachineImage.latest_amazon_linux(),
+            machine_image=ec2.MachineImage.latest_amazon_linux2(),
             security_group=web_sg,
-            subnet_selection=ec2.SubnetSelection(subnet_group_name="PublicSubnet1"),
-            key_name="baldwinr-ec2-seis615"                                
-        )
+            vpc_subnets=ec2.SubnetSelection(
+                subnets=[public_subnets.subnets[0]]
+            ),
+            key_pair=key_pair
 
+        )
+        
         ec2.Instance(self, "Web Server 2",
             vpc=vpc,
             instance_type=InstanceType("t2.micro"),
-            machine_image=ec2.MachineImage.latest_amazon_linux(),
+            machine_image=ec2.MachineImage.latest_amazon_linux2(),
             security_group=web_sg,
-            subnet_selection=ec2.SubnetSelection(subnet_group_name="PublicSubnet2"),
-            key_name="baldwinr-ec2-seis615"                                                               
-        )            
+            vpc_subnets=ec2.SubnetSelection(
+                subnets=[public_subnets.subnets[1]]
+            ),
+            key_pair=key_pair
+        )          
 
 # A RDS instance with MySQL engine with all private subnets as its subnet group.
         
@@ -57,16 +66,14 @@ class ServerStack(Stack):
             vpc=vpc,
             vpc_subnets=ec2.SubnetSelection(
                 subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS
-            )
+            ),
+            description="Subnet for RDS"
         )
 
         rds_instance = rds.DatabaseInstance(self, "RDSInstance",
             engine=rds.DatabaseInstanceEngine.mysql(version=rds.MysqlEngineVersion.VER_8_0_39),
-            instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2,
-                ec2.InstanceSize.MICRO),
             vpc=vpc,
-            storage_type=rds.StorageType.IO1,
-            iops=1000,
+            storage_type=rds.StorageType.GP2,
             security_groups=[rds_sg],
             subnet_group=rds_subnet_group,
             removal_policy=RemovalPolicy.DESTROY,

@@ -8,33 +8,18 @@ class NetworkStack(Stack):
 
         self.vpc = ec2.Vpc(
             self, "VPC",
-            availability_zones=["us-east-1a", "us-east-1b"], 
+            availability_zones=["us-east-1a", "us-east-1b"],
             subnet_configuration=[
                 ec2.SubnetConfiguration(
-                    name="PublicSubnet1",
+                    name="Public",
                     subnet_type=ec2.SubnetType.PUBLIC,
-                    availability_zone="us-east-1a",
                     cidr_mask=24
                 ),
                 ec2.SubnetConfiguration(
-                    name="PrivateSubnet1",
+                    name="Private",
                     subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS,
-                    availability_zone="us-east-1a",
                     cidr_mask=24
-                ),
-                ec2.SubnetConfiguration(
-                    name="PublicSubnet2",
-                    subnet_type=ec2.SubnetType.PUBLIC,
-                    availability_zone="us-east-1b",
-                    cidr_mask=24
-                ),
-                ec2.SubnetConfiguration(
-                    name="PrivateSubnet2",
-                    subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS,
-                    availability_zone="us-east-1b",
-                    cidr_mask=24
-                ),
+                )
             ]
         )
 
-# commenting to fix error with github commits
